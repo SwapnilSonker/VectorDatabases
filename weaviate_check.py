@@ -2,11 +2,12 @@ import fitz
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import weaviate
-from weaviate.util import generate_uuid5
+# from weaviate.util import generate_uuid5
 from weaviate.classes.config import Configure, Property, DataType
 from weaviate.classes.init import Auth
 import os
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
@@ -14,6 +15,9 @@ CLASS_NAME = "PDFChunk"
 WEAVIATE_URL = os.getenv("WEAVIATE_URL")
 WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY")
 
+
+def generate_uuid5(chunk):
+    return str(uuid.uuid4())
 
 def extract_text_from_pdf(path):
     doc = fitz.open(path)
@@ -67,6 +71,15 @@ results = collection.query.near_vector(
     near_vector=query_vector,
     limit=3
 )
+
+# text_results = collection.query.near_text(
+#     near_text = {"concepts" : [query]},
+#     limit = 5,
+# )
+
+# print("\n Top results")
+# for obj in results.objects:
+#     print("near text --" , obj.properties["text"])
 
 print("\n🔍 Top Matches:")
 for obj in results.objects:
